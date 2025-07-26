@@ -16,7 +16,7 @@ struct PacketHeader
     uint8_t     m_playerCarIndex;          // Index of player's car in the array
     uint8_t     m_secondaryPlayerCarIndex; // Index of secondary player's car in the array (splitscreen)
                                          // 255 if no second player
-};
+} ;
 
 struct CarMotionData
 {
@@ -42,9 +42,9 @@ struct CarMotionData
 
 struct PacketMotionData
 {
-    PacketHeader    m_header;               	// Header
+    struct PacketHeader    m_header;               	// Header
 
-    CarMotionData   m_carMotionData[22];    	// Data for all cars on track
+    struct CarMotionData   m_carMotionData[22];    	// Data for all cars on track
 };
 
 
@@ -69,7 +69,7 @@ struct WeatherForecastSample
 
 struct PacketSessionData
 {
-    PacketHeader    m_header;               	// Header
+    struct PacketHeader    m_header;               	// Header
 
     uint8_t           m_weather;              	// Weather - 0 = clear, 1 = light cloud, 2 = overcast
                                             	// 3 = light rain, 4 = heavy rain, 5 = storm
@@ -90,12 +90,12 @@ struct PacketSessionData
     uint8_t           m_spectatorCarIndex;  	// Index of the car being spectated
     uint8_t           m_sliProNativeSupport;	// SLI Pro support, 0 = inactive, 1 = active
     uint8_t           m_numMarshalZones;         	// Number of marshal zones to follow
-    MarshalZone     m_marshalZones[21];         	// List of marshal zones – max 21
+    struct MarshalZone     m_marshalZones[21];         	// List of marshal zones – max 21
     uint8_t           m_safetyCarStatus;           // 0 = no safety car, 1 = full
                                                  // 2 = virtual, 3 = formation lap
     uint8_t           m_networkGame;               // 0 = offline, 1 = online
     uint8_t           m_numWeatherForecastSamples; // Number of weather samples to follow
-    WeatherForecastSample m_weatherForecastSamples[64];   // Array of weather forecast samples
+    struct WeatherForecastSample m_weatherForecastSamples[64];   // Array of weather forecast samples
     uint8_t           m_forecastAccuracy;          // 0 = Perfect, 1 = Approximate
     uint8_t           m_aiDifficulty;              // AI Difficulty rating – 0-110
     uint32_t          m_seasonLinkIdentifier;      // Identifier for season - persists across saves
@@ -201,9 +201,9 @@ struct LapData
 
 struct PacketLapData
 {
-    PacketHeader    m_header;              // Header
+    struct PacketHeader    m_header;              // Header
 
-    LapData         m_lapData[22];         // Lap data for all cars on track
+    struct LapData         m_lapData[22];         // Lap data for all cars on track
 
     uint8_t	m_timeTrialPBCarIdx; 	// Index of Personal Best car in time trial (255 if invalid)
     uint8_t	m_timeTrialRivalCarIdx; 	// Index of Rival car in time trial (255 if invalid)
@@ -305,10 +305,10 @@ union EventDataDetails
 
 struct PacketEventData
 {
-    PacketHeader    	m_header;               	// Header
+   struct PacketHeader    	m_header;               	// Header
     
     uint8_t           	m_eventStringCode[4];   	// Event string code, see below
-    EventDataDetails	m_eventDetails;         	// Event details - should be interpreted differently
+    union EventDataDetails	m_eventDetails;         	// Event details - should be interpreted differently
                                                  // for each type
 };
 
@@ -332,11 +332,11 @@ struct ParticipantData
 
 struct PacketParticipantsData
 {
-    PacketHeader    m_header;            // Header
+    struct PacketHeader    m_header;            // Header
 
     uint8_t           m_numActiveCars;	// Number of active cars in the data – should match number of
                                          // cars on HUD
-    ParticipantData m_participants[22];
+    struct ParticipantData m_participants[22];
 };
 
 struct CarSetupData
@@ -368,9 +368,9 @@ struct CarSetupData
 
 struct PacketCarSetupData
 {
-    PacketHeader    m_header;            // Header
+    struct PacketHeader    m_header;            // Header
 
-    CarSetupData    m_carSetups[22];
+    struct CarSetupData    m_carSetups[22];
 
     float         m_nextFrontWingValue;	// Value of front wing after next pit stop - player only
 };
@@ -397,9 +397,9 @@ struct CarTelemetryData
 
 struct PacketCarTelemetryData
 {
-    PacketHeader    	m_header;	      // Header
+    struct PacketHeader    	m_header;	      // Header
 
-    CarTelemetryData    m_carTelemetryData[22];
+    struct CarTelemetryData    m_carTelemetryData[22];
 
     uint8_t               m_mfdPanelIndex;       // Index of MFD panel open - 255 = MFD closed
                                                // Single player, race – 0 = Car setup, 1 = Pits
@@ -452,11 +452,10 @@ struct CarStatusData
 
 struct PacketCarStatusData
 {
-    PacketHeader    	m_header;	   // Header
+    struct PacketHeader    	m_header;	   // Header
 
-    CarStatusData	m_carStatusData[22];
+    struct CarStatusData	m_carStatusData[22];
 };
-
 
 struct FinalClassificationData
 {
@@ -480,10 +479,10 @@ struct FinalClassificationData
 
 struct PacketFinalClassificationData
 {
-    PacketHeader    m_header;                      // Header
+    struct PacketHeader    m_header;                      // Header
 
     uint8_t                      m_numCars;          // Number of cars in the final classification
-    FinalClassificationData    m_classificationData[22];
+    struct FinalClassificationData    m_classificationData[22];
 };
 
 
@@ -504,11 +503,11 @@ struct LobbyInfoData
 
 struct PacketLobbyInfoData
 {
-    PacketHeader    m_header;                       // Header
+    struct PacketHeader    m_header;                       // Header
 
     // Packet specific data
     uint8_t               m_numPlayers;               // Number of players in the lobby data
-    LobbyInfoData       m_lobbyPlayers[22];
+    struct LobbyInfoData       m_lobbyPlayers[22];
 };
 
 struct CarDamageData
@@ -538,9 +537,9 @@ struct CarDamageData
 
 struct PacketCarDamageData
 {
-    PacketHeader    m_header;               // Header
+    struct PacketHeader    m_header;               // Header
 
-    CarDamageData   m_carDamageData[22];
+    struct CarDamageData   m_carDamageData[22];
 };
 
 
@@ -566,7 +565,7 @@ struct TyreStintHistoryData
 
 struct PacketSessionHistoryData
 {
-    PacketHeader  m_header;                   // Header
+    struct PacketHeader  m_header;                   // Header
 
     uint8_t         m_carIdx;                   // Index of the car this lap data relates to
     uint8_t         m_numLaps;                  // Num laps in the data (including current partial lap)
@@ -577,8 +576,8 @@ struct PacketSessionHistoryData
     uint8_t         m_bestSector2LapNum;        // Lap the best Sector 2 time was achieved on
     uint8_t         m_bestSector3LapNum;        // Lap the best Sector 3 time was achieved on
 
-    LapHistoryData          m_lapHistoryData[100];	// 100 laps of data max
-    TyreStintHistoryData    m_tyreStintsHistoryData[8];
+    struct LapHistoryData          m_lapHistoryData[100];	// 100 laps of data max
+    struct TyreStintHistoryData    m_tyreStintsHistoryData[8];
 };
 
 struct TyreSetData
@@ -596,18 +595,18 @@ struct TyreSetData
 
 struct PacketTyreSetsData
 {
-    PacketHeader    m_header;            // Header
+    struct PacketHeader    m_header;            // Header
 
     uint8_t           m_carIdx;            // Index of the car this data relates to
 
-    TyreSetData     m_tyreSetData[20];	// 13 (dry) + 7 (wet)
+    struct TyreSetData     m_tyreSetData[20];	// 13 (dry) + 7 (wet)
 
     uint8_t           m_fittedIdx;         // Index into array of fitted tyre
 };
 
 struct PacketMotionExData
 {
-    PacketHeader    m_header;               	// Header
+    struct PacketHeader    m_header;               	// Header
 
     // Extra player car ONLY data
     float         m_suspensionPosition[4];       // Note: All wheel arrays have the following order:
@@ -656,9 +655,9 @@ struct TimeTrialDataSet
 
 struct PacketTimeTrialData
 {
-    PacketHeader    m_header;               	// Header
+    struct PacketHeader    m_header;               	// Header
 
-    TimeTrialDataSet    m_playerSessionBestDataSet;     // Player session best data set
-    TimeTrialDataSet    m_personalBestDataSet;          // Personal best data set
-    TimeTrialDataSet    m_rivalDataSet;                 // Rival data set
+    struct TimeTrialDataSet    m_playerSessionBestDataSet;     // Player session best data set
+    struct TimeTrialDataSet    m_personalBestDataSet;          // Personal best data set
+    struct TimeTrialDataSet    m_rivalDataSet;                 // Rival data set
 };
