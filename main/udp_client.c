@@ -39,18 +39,32 @@
 #define PORT CONFIG_EXAMPLE_PORT
 
 static const char *TAG = "UDP Connection";
-static uint8_t info = 0x00000000;
+static uint8_t *info = 0x00000000;
+static struct PacketMotionData *motionData;
+static struct PacketSessionData *sessionData;
+static struct PacketLapData *lapData;
+static struct PacketEventData *eventData;
+static struct PacketParticipantsData *participantData;
+static struct PacketCarSetupData *carSetupData;
 static struct PacketCarTelemetryData *telemetryData;
+static struct PacketCarStatusData *statusData;
+static struct PacketFinalClassificationData *finalClassificationData;
+static struct PacketLobbyInfoData *lobbyInfoData;
+static struct PacketCarDamageData *carDammageData;
+static struct PacketSessionHistoryData *sessionHistoryData;
+static struct PacketTyreSetsData *tyreSetsData;
+static struct PacketMotionExData *motionDataExData;
+static struct PacketTimeTrialData *timeTrialData;
 
 
 static void display_motion(void *pvParameters){
     static u8_t temp;
     while(1){
-        temp = info >> 4;
+        temp = *info >> 4;
         if(temp) gpio_set_level(GPIO_NUM_5,1); //accelerateur
         else gpio_set_level(GPIO_NUM_5,0); //accelerateur
 
-        temp = (info << 4) >>4;
+        temp = (*info << 4) >>4;
         if(temp) gpio_set_level(GPIO_NUM_18,1); //frein
         else gpio_set_level(GPIO_NUM_18,0); //frein
         vTaskDelay(pdMS_TO_TICKS(200));
@@ -120,14 +134,31 @@ static void udp_client_task(void *pvParameters)
             // Data received
             else {
                 rx_buffer[len] = 0; // Null-terminate whatever we received and treat like a string
-                ESP_LOGE(TAG, "PACKET ID: %d",rx_buffer[6]);
                 switch (rx_buffer[6])
                 {
+                case 0:
+                    motionData = (struct PacketMotionData*) rx_buffer;
+                break;
+                case 1:
+                    sessionData = (struct PacketSessionData *) rx_buffer;
+                break;
+                case 2:
+                    lapData = (struct PacketLapData*) rx_buffer;
+                break;
+                case 3:
+                    eventData = (struct PacketEventData*) rx_buffer;
+                break;
+                case 4:
+                    participantData = (struct PacketParticipantsData*) rx_buffer;
+                break;
+                case 5:
+                    carSetupData = (struct PacketCarSetupData*) rx_buffer;
+                break;
                 case 6:
                     telemetryData = (struct PacketCarTelemetryData*) rx_buffer;
-                    info |= (int) (telemetryData->m_carTelemetryData->m_throttle * 15) << 4 ;
-                    info |= (int) (telemetryData->m_carTelemetryData->m_brake * 15);
-                    printf("info: %d",info);
+                    *info |= (int) (telemetryData->m_carTelemetryData->m_throttle * 15) << 4 ;
+                    *info |= (int) (telemetryData->m_carTelemetryData->m_brake * 15);
+                    printf("info: %d\n",*info);
                     break;
                 
                 default:
