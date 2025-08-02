@@ -14,6 +14,7 @@
 #define PORT CONFIG_EXAMPLE_PORT
 
 static const char *TAG = "UDP Connection";
+<<<<<<< HEAD
 static uint8_t *info = 0b00000000;
 static struct PacketMotionData *motionData;
 static struct PacketSessionData *sessionData;
@@ -30,23 +31,65 @@ static struct PacketSessionHistoryData *sessionHistoryData;
 static struct PacketTyreSetsData *tyreSetsData;
 static struct PacketMotionExData *motionDataExData;
 static struct PacketTimeTrialData *timeTrialData;
+=======
+static struct PacketMotionData motionData;
+static struct PacketSessionData sessionData;
+static struct PacketLapData lapData;
+static struct PacketEventData eventData;
+static struct PacketParticipantsData participantData;
+static struct PacketCarSetupData carSetupData;
+static struct PacketCarTelemetryData telemetryData;
+static struct PacketCarStatusData statusData;
+static struct PacketFinalClassificationData finalClassificationData;
+static struct PacketLobbyInfoData lobbyInfoData;
+static struct PacketCarDamageData carDammageData;
+static struct PacketSessionHistoryData sessionHistoryData;
+static struct PacketTyreSetsData tyreSetsData;
+static struct PacketMotionExData motionDataExData;
+static struct PacketTimeTrialData timeTrialData;
+>>>>>>> c8f8914af5454bfc9ca731c7519be1fcd3832b9c
 
+struct DataPointers
+{
+    static struct PacketMotionData *pMotionData;
+    static struct PacketSessionData *pSessionData;
+    static struct PacketLapData *pLapData;
+    static struct PacketEventData *pEventData;
+    static struct PacketParticipantsData *pParticipantData;
+    static struct PacketCarSetupData *pCarSetupData;
+    static struct PacketCarTelemetryData *pTelemetryData;
+    static struct PacketCarStatusData *pStatusData;
+    static struct PacketFinalClassificationData *pFinalClassificationData;
+    static struct PacketLobbyInfoData *pLobbyInfoData;
+    static struct PacketCarDamageData *pCarDammageData;
+    static struct PacketSessionHistoryData *pSessionHistoryData;
+    static struct PacketTyreSetsData *pTyreSetsData;
+    static struct PacketMotionExData *pMotionDataExData;
+    static struct PacketTimeTrialData *pTimeTrialData;
+} DataPointers_init = {&motionData,$sessionData,&lapData,&eventData,&participantData,&carSetupData,&telemetryData,&statusData,&finalClassificationData,&lobbyInfoData,&carDammageData,&sessionHistoryData,&tyreSetsData,&motionDataExData,&timeTrialData};
 
-static void display_motion(void *pvParameters){
-    static u8_t temp;
+typedef struct DataPointers DataPointers;
+static DataPointers dataPointers = DataPointers_init;
+
+static void display_motion(struct PacketCarTelemetryData *pvParameters){
+    static float *throtle = &telemetryData.m_throttle
+    static float *brake = &telemetryData.m_brake;
     while(1){
-        temp = *info >> 4;
-        if(temp) gpio_set_level(GPIO_NUM_5,1); //accelerateur
+        if(*throttle > 0) gpio_set_level(GPIO_NUM_5,1); //accelerateur
         else gpio_set_level(GPIO_NUM_5,0); //accelerateur
 
+<<<<<<< HEAD
         temp = (*info && 0b00001111);
         if(temp) gpio_set_level(GPIO_NUM_18,1); //frein
+=======
+        if(*brake > 0) gpio_set_level(GPIO_NUM_18,1); //frein
+>>>>>>> c8f8914af5454bfc9ca731c7519be1fcd3832b9c
         else gpio_set_level(GPIO_NUM_18,0); //frein
         vTaskDelay(pdMS_TO_TICKS(200));
     }
 };
 
-static void udp_client_task(void *pvParameters)
+static void udp_client_task(DataPointers *dataPointers)
 {
     uint8_t rx_buffer[183];
     int addr_family = 0;
@@ -112,31 +155,34 @@ static void udp_client_task(void *pvParameters)
                 switch (rx_buffer[6])
                 {
                 case 0:
-                    motionData = (struct PacketMotionData*) rx_buffer;
+                    dataPointers->pMotionData = (struct PacketMotionData) rx_buffer;
                 break;
                 case 1:
-                    sessionData = (struct PacketSessionData *) rx_buffer;
+                    dataPointers->pSessionData = (struct PacketSessionData) rx_buffer;
                 break;
                 case 2:
-                    lapData = (struct PacketLapData*) rx_buffer;
+                    dataPointers->pLapData = (struct PacketLapData) rx_buffer;
                 break;
                 case 3:
-                    eventData = (struct PacketEventData*) rx_buffer;
+                    dataPointers->pEventData = (struct PacketEventData) rx_buffer;
                 break;
                 case 4:
-                    participantData = (struct PacketParticipantsData*) rx_buffer;
+                    dataPointers->pParticipantData = (struct PacketParticipantsData) rx_buffer;
                 break;
                 case 5:
-                    carSetupData = (struct PacketCarSetupData*) rx_buffer;
+                    dataPointers->pCarSetupData = (struct PacketCarSetupData) rx_buffer;
                 break;
                 case 6:
+<<<<<<< HEAD
                     telemetryData = (struct PacketCarTelemetryData*) rx_buffer;
                     *info |= (int) (telemetryData->m_carTelemetryData->m_throttle * 15) << 4 ;
                     *info |= (int) (telemetryData->m_carTelemetryData->m_brake * 15);
                     LED_Strip_refresh(telemetryData->m_carTelemetryData->m_engineRPM);
                     printf("info: %d\n",*info);
+=======
+                    dataPointers->pElemetryData = (struct PacketCarTelemetryData) rx_buffer;
+>>>>>>> c8f8914af5454bfc9ca731c7519be1fcd3832b9c
                     break;
-                
                 default:
                     break;
                 }
@@ -164,6 +210,6 @@ void app_main(void)
      */
     ESP_ERROR_CHECK(example_connect());
 
-    xTaskCreate(udp_client_task, "udp_client", 8192, NULL, 5, NULL);
-    xTaskCreate(display_motion,"display_motion",1024,NULL,5,NULL);
+    xTaskCreate(udp_client_task, "udp_client", 8192, &dataPointers, 5, NULL);
+    xTaskCreate(display_motion,"display_motion",1024,&telemetryData,5,NULL);
 }
