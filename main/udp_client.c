@@ -1,29 +1,4 @@
-/* BSD Socket API Example
-
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
-
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
-*/
-#include <string.h>
-#include <sys/param.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/event_groups.h"
-#include "esp_system.h"
-#include "esp_event.h"
-#include "esp_log.h"
-#include "nvs_flash.h"
-#include "esp_netif.h"
-#include "protocol_examples_common.h"
-#include "F1.h"
-#include "lwip/err.h"
-#include "lwip/sockets.h"
-#include "lwip/sys.h"
-#include <lwip/netdb.h>
-#include "driver/gpio.h"
-#include "esp_mac.h"
+#include "WS2812B.h"
 
 #ifdef CONFIG_EXAMPLE_SOCKET_IP_INPUT_STDIN
 #include "addr_from_stdin.h"
@@ -39,7 +14,7 @@
 #define PORT CONFIG_EXAMPLE_PORT
 
 static const char *TAG = "UDP Connection";
-static uint8_t *info = 0x00000000;
+static uint8_t *info = 0b00000000;
 static struct PacketMotionData *motionData;
 static struct PacketSessionData *sessionData;
 static struct PacketLapData *lapData;
@@ -64,7 +39,7 @@ static void display_motion(void *pvParameters){
         if(temp) gpio_set_level(GPIO_NUM_5,1); //accelerateur
         else gpio_set_level(GPIO_NUM_5,0); //accelerateur
 
-        temp = (*info << 4) >>4;
+        temp = (*info && 0b00001111);
         if(temp) gpio_set_level(GPIO_NUM_18,1); //frein
         else gpio_set_level(GPIO_NUM_18,0); //frein
         vTaskDelay(pdMS_TO_TICKS(200));
@@ -158,6 +133,7 @@ static void udp_client_task(void *pvParameters)
                     telemetryData = (struct PacketCarTelemetryData*) rx_buffer;
                     *info |= (int) (telemetryData->m_carTelemetryData->m_throttle * 15) << 4 ;
                     *info |= (int) (telemetryData->m_carTelemetryData->m_brake * 15);
+                    LED_Strip_refresh(telemetryData->m_carTelemetryData->m_engineRPM);
                     printf("info: %d\n",*info);
                     break;
                 
