@@ -14,24 +14,6 @@
 #define PORT CONFIG_EXAMPLE_PORT
 
 static const char *TAG = "UDP Connection";
-<<<<<<< HEAD
-static uint8_t *info = 0b00000000;
-static struct PacketMotionData *motionData;
-static struct PacketSessionData *sessionData;
-static struct PacketLapData *lapData;
-static struct PacketEventData *eventData;
-static struct PacketParticipantsData *participantData;
-static struct PacketCarSetupData *carSetupData;
-static struct PacketCarTelemetryData *telemetryData;
-static struct PacketCarStatusData *statusData;
-static struct PacketFinalClassificationData *finalClassificationData;
-static struct PacketLobbyInfoData *lobbyInfoData;
-static struct PacketCarDamageData *carDammageData;
-static struct PacketSessionHistoryData *sessionHistoryData;
-static struct PacketTyreSetsData *tyreSetsData;
-static struct PacketMotionExData *motionDataExData;
-static struct PacketTimeTrialData *timeTrialData;
-=======
 static struct PacketMotionData motionData;
 static struct PacketSessionData sessionData;
 static struct PacketLapData lapData;
@@ -47,43 +29,37 @@ static struct PacketSessionHistoryData sessionHistoryData;
 static struct PacketTyreSetsData tyreSetsData;
 static struct PacketMotionExData motionDataExData;
 static struct PacketTimeTrialData timeTrialData;
->>>>>>> c8f8914af5454bfc9ca731c7519be1fcd3832b9c
 
 struct DataPointers
 {
-    static struct PacketMotionData *pMotionData;
-    static struct PacketSessionData *pSessionData;
-    static struct PacketLapData *pLapData;
-    static struct PacketEventData *pEventData;
-    static struct PacketParticipantsData *pParticipantData;
-    static struct PacketCarSetupData *pCarSetupData;
-    static struct PacketCarTelemetryData *pTelemetryData;
-    static struct PacketCarStatusData *pStatusData;
-    static struct PacketFinalClassificationData *pFinalClassificationData;
-    static struct PacketLobbyInfoData *pLobbyInfoData;
-    static struct PacketCarDamageData *pCarDammageData;
-    static struct PacketSessionHistoryData *pSessionHistoryData;
-    static struct PacketTyreSetsData *pTyreSetsData;
-    static struct PacketMotionExData *pMotionDataExData;
-    static struct PacketTimeTrialData *pTimeTrialData;
-} DataPointers_init = {&motionData,$sessionData,&lapData,&eventData,&participantData,&carSetupData,&telemetryData,&statusData,&finalClassificationData,&lobbyInfoData,&carDammageData,&sessionHistoryData,&tyreSetsData,&motionDataExData,&timeTrialData};
+    struct PacketMotionData *pMotionData;
+    struct PacketSessionData *pSessionData;
+    struct PacketLapData *pLapData;
+    struct PacketEventData *pEventData;
+    struct PacketParticipantsData *pParticipantData;
+    struct PacketCarSetupData *pCarSetupData;
+    struct PacketCarTelemetryData *pTelemetryData;
+    struct PacketCarStatusData *pStatusData;
+    struct PacketFinalClassificationData *pFinalClassificationData;
+    struct PacketLobbyInfoData *pLobbyInfoData;
+    struct PacketCarDamageData *pCarDammageData;
+    struct PacketSessionHistoryData *pSessionHistoryData;
+    struct PacketTyreSetsData *pTyreSetsData;
+    struct PacketMotionExData *pMotionDataExData;
+    struct PacketTimeTrialData *pTimeTrialData;
+} DataPointers_init;
 
 typedef struct DataPointers DataPointers;
-static DataPointers dataPointers = DataPointers_init;
+static DataPointers dataPointers = {&motionData,&sessionData,&lapData,&eventData,&participantData,&carSetupData,&telemetryData,&statusData,&finalClassificationData,&lobbyInfoData,&carDammageData,&sessionHistoryData,&tyreSetsData,&motionDataExData,&timeTrialData};;
 
-static void display_motion(struct PacketCarTelemetryData *pvParameters){
-    static float *throtle = &telemetryData.m_throttle
-    static float *brake = &telemetryData.m_brake;
+static void display_motion(struct PacketCarTelemetryData *pTelemetryData){
+    float *throttle = &(pTelemetryData->m_carTelemetryData->m_throttle);
+    float *brake = &(pTelemetryData->m_carTelemetryData->m_brake);
     while(1){
         if(*throttle > 0) gpio_set_level(GPIO_NUM_5,1); //accelerateur
         else gpio_set_level(GPIO_NUM_5,0); //accelerateur
 
-<<<<<<< HEAD
-        temp = (*info && 0b00001111);
-        if(temp) gpio_set_level(GPIO_NUM_18,1); //frein
-=======
         if(*brake > 0) gpio_set_level(GPIO_NUM_18,1); //frein
->>>>>>> c8f8914af5454bfc9ca731c7519be1fcd3832b9c
         else gpio_set_level(GPIO_NUM_18,0); //frein
         vTaskDelay(pdMS_TO_TICKS(200));
     }
@@ -155,33 +131,25 @@ static void udp_client_task(DataPointers *dataPointers)
                 switch (rx_buffer[6])
                 {
                 case 0:
-                    dataPointers->pMotionData = (struct PacketMotionData) rx_buffer;
+                    dataPointers->pMotionData = (struct PacketMotionData*) rx_buffer;
                 break;
                 case 1:
-                    dataPointers->pSessionData = (struct PacketSessionData) rx_buffer;
+                    dataPointers->pSessionData = (struct PacketSessionData*) rx_buffer;
                 break;
                 case 2:
-                    dataPointers->pLapData = (struct PacketLapData) rx_buffer;
+                    dataPointers->pLapData = (struct PacketLapData*) rx_buffer;
                 break;
                 case 3:
-                    dataPointers->pEventData = (struct PacketEventData) rx_buffer;
+                    dataPointers->pEventData = (struct PacketEventData*) rx_buffer;
                 break;
                 case 4:
-                    dataPointers->pParticipantData = (struct PacketParticipantsData) rx_buffer;
+                    dataPointers->pParticipantData = (struct PacketParticipantsData*) rx_buffer;
                 break;
                 case 5:
-                    dataPointers->pCarSetupData = (struct PacketCarSetupData) rx_buffer;
+                    dataPointers->pCarSetupData = (struct PacketCarSetupData*) rx_buffer;
                 break;
                 case 6:
-<<<<<<< HEAD
-                    telemetryData = (struct PacketCarTelemetryData*) rx_buffer;
-                    *info |= (int) (telemetryData->m_carTelemetryData->m_throttle * 15) << 4 ;
-                    *info |= (int) (telemetryData->m_carTelemetryData->m_brake * 15);
-                    LED_Strip_refresh(telemetryData->m_carTelemetryData->m_engineRPM);
-                    printf("info: %d\n",*info);
-=======
-                    dataPointers->pElemetryData = (struct PacketCarTelemetryData) rx_buffer;
->>>>>>> c8f8914af5454bfc9ca731c7519be1fcd3832b9c
+                    dataPointers->pTelemetryData = (struct PacketCarTelemetryData*) rx_buffer;
                     break;
                 default:
                     break;
@@ -200,9 +168,9 @@ static void udp_client_task(DataPointers *dataPointers)
 
 void app_main(void)
 {
-    ESP_ERROR_CHECK(nvs_flash_init());
-    ESP_ERROR_CHECK(esp_netif_init());
-    ESP_ERROR_CHECK(esp_event_loop_create_default());
+    nvs_flash_init();
+    esp_netif_init();
+    esp_event_loop_create_default();
 
     /* This helper function configures Wi-Fi or Ethernet, as selected in menuconfig.
      * Read "Establishing Wi-Fi or Ethernet Connection" section in
